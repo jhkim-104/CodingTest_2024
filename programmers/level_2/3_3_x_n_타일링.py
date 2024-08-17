@@ -40,6 +40,16 @@
     - n = 8의 특수 패턴 => 2
 - 점화식 구성(n > 2)
     - dp[n] = dp[n - 2] * dp[2] + (dp[n - 4] * 2 + dp[n - 6] * 2 + ... dp[2] * 2) + 2
+- 점화식 개선(n > 2) 
+    - 기존 점화식은 O(N^2)로 느립니다.
+    - 마지막 + 2를 특수 패턴과 합칩니다. : dp[n] = dp[n - 2] * dp[2] + (dp[n - 4] * 2 + dp[n - 6] * 2 + ... dp[2] * 2 + 1 * 2)
+    - (0인 경우를 1로 삼은 것과 마찬가지로 처리가 됩니다.)
+    - 따라서, dp[n] = dp[n-2] * dp[2] + (dp[n-4] + ... + dp[0]) * 2 = dp[n-2] * 3 + (dp[n-4] + ... + dp[0]) * 2
+    - 양변에 dp[n-2]를 뻬줍니다.
+    - dp[n] - dp[n-2] = dp[n-2] * 2 + (dp[n-4] + ... + dp[0]) * 2
+    - dp[n] - dp[n-2] = (dp[n-2] + ... + dp[0]) * 2
+    - 이를 극한으로 정리하면 다음과 같이 정리가 가능
+    - 새 점화식 : dp[n] = 4 * dp[n-2] - dp[n-4]
 """
 def solution(n):
     INF = 1_000_000_007
@@ -48,15 +58,10 @@ def solution(n):
         return 0
     
     answer = 0
-    dp_list = [1, 3] # S(0)은 사용하지 않지만 1로 두어 식 구성의 편리성을 더함, 짝수만 리스트로 사용
-    for ii in range(2, n // 2 + 1): # n이 짝수므로 n//2를 통해서 ii를 진행, n까지 반복이라 n//2 + 1까지로 설정
+    dp_list = [1, 3, 11] # S(0)은 사용하지 않지만 1로 두어 식 구성의 편리성을 더함, 짝수만 리스트로 사용
+    for ii in range(3, n // 2 + 1): # n이 짝수므로 n//2를 통해서 ii를 진행, n까지 반복이라 n//2 + 1까지로 설정
         # 짝수만 사용하므로 모든 idx 상수는 //2 처리 상태
-        current_count = dp_list[ii - 1] * dp_list[1] # dp[n - 2] * dp[2]
-        
-        for ii in range(1, ii - 1): # 2부터 n - 4까지의 새 패턴 조합
-            current_count += dp_list[ii] * 2
-        current_count += 2 # <n=ii>
-        dp_list.append(current_count)
+        dp_list.append(dp_list[ii - 1] * 4 - dp_list[ii - 2]) # 정리한 점화식 : dp[n] = 4 * dp[n-2] - dp[n-4]
         
     answer = dp_list[-1] # 마지막 값 반환
     return answer % INF # 결과 처리 전 숫자를 줄이기
