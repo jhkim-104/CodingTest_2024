@@ -25,15 +25,17 @@
     - 따라서 방법의 개수를 S(n)라고 하면, 점화식은 S(n) = S(n-1) + S(n-2) 가 됩니다.
     - 추가로 S(1) = 1, S(2) = 2가 됩니다.
     - 동적 계획법을 이용한 피보나치 수열을 이용해서 문제를 풀면됩니다.
-- 풀이 결과
-    - 효율성 2, 5, 6 시간 초과
+- 시간 초과 해결 방법
+    - 2, 5, 6이 시간 초과 발생
+    - 너무 큰 경우의 수를 계속 다루지 않고 중간에서 작은 수로 변경하게 수정
+    - dp_list에 작은 값이 들어가도록 나머지 연산을 중간으로 변경
 """
 def solution(n):
     answer = 0
     
     dp_list = [0, 1, 2] # S(0)은 사용하지 않음, S(1), S(2) 초기화
     for ii in range(3, n + 1): # n까지 반복이라 n + 1까지로 설정
-        dp_list.append(dp_list[ii - 1] + dp_list[ii - 2])
+        dp_list.append((dp_list[ii - 1] + dp_list[ii - 2]) % 1000000007)
         
     answer = dp_list[-1] # 마지막 값 반환
-    return answer % 1000000007
+    return answer
